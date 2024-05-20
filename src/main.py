@@ -2,7 +2,6 @@ import os
 from flask import Flask, jsonify, request
 from sqlalchemy.orm import DeclarativeBase
 from flask_sqlalchemy import SQLAlchemy
-# from model import Data
 import csv
 
 
@@ -42,11 +41,10 @@ with app.app_context():
     with open("example_batch_records.csv", 'r') as fileName:
         reader = csv.reader(fileName, delimiter=",")
         for row in reader:
-            
-            batch_number = row[0]
+            batch_clean = ''.join(i for i in row[0] if i.isdigit())
+            batch_number = int(batch_clean)
             submitted_at= row[1]
             nodes_used = row[2]
-            # print(batch_number, submitted_at, nodes_used)
             db.session.add_all([
                 Data(batch_number=batch_number, submitted_at=submitted_at, nodes_used=nodes_used)
             ])
