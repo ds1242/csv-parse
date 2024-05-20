@@ -1,1 +1,1 @@
-flask --app src/main.py run --debug
+python src/main.py
