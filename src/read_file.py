@@ -8,7 +8,7 @@ def read_csv(path):
             for row in file_reader:
                 print(', '.join(row))
     except:
-         print('invalid path')
+         print('invalid path to file')
 
         
 
