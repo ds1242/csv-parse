@@ -67,9 +67,5 @@ def batch_jobs():
                    } for row in all_records] })
 
 
-@app.route('/batch_jobs/', methods=["GET"])
-def filter_batch_data():
-    pass
-
 if __name__ == '__main__':
     app.run(debug=True)
