@@ -22,9 +22,9 @@ db.init_app(app)
 class Data(db.Model):
     __tablename__ = 'batch_jobs'
     id = db.Column(db.Integer, primary_key=True)
-    batch_number = db.Column(db.String(50), nullable=True)
+    batch_number = db.Column(db.Integer, nullable=True)
     submitted_at = db.Column(db.String(50), nullable=True)
-    nodes_used = db.Column(db.String(50), nullable=True)
+    nodes_used = db.Column(db.Integer, nullable=True)
 
     def __repr__(self):
         return f"<Data {self.batch_number}>"
@@ -42,6 +42,7 @@ with app.app_context():
     with open("example_batch_records.csv", 'r') as fileName:
         reader = csv.reader(fileName, delimiter=",")
         for row in reader:
+            
             batch_number = row[0]
             submitted_at= row[1]
             nodes_used = row[2]
@@ -58,8 +59,8 @@ def batch_jobs():
     return jsonify({"links": {
                     "self": request.url},
                     "data": [{
-                       "type": "batch_jobs",
                        "id": row.id,
+                       "type": "batch_jobs",
                        "attributes": {
                            "batch_number": row.batch_number,
                            "submitted_at": row.submitted_at,
