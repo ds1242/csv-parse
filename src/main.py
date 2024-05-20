@@ -1,75 +1,51 @@
-import os
-from flask import Flask, jsonify, request
-from sqlalchemy.orm import DeclarativeBase
-from flask_sqlalchemy import SQLAlchemy
 import csv
+import sqlite3
 
 
-class Base(DeclarativeBase):
-  pass
 
-db = SQLAlchemy(model_class=Base)
-app = Flask(__name__)
-app.config['SECRET_KEY'] = 'secretkeytousewithflask'
-basedir = os.path.abspath(os.path.dirname(__file__))
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///batch_jobs.db'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'batch_jobs.db')
+def connect_to_database(db_path):
+    if db_path:
+        connection = sqlite3.connect(db_path)
+        cursor = connection.cursor()
+        return connection, cursor
+    else:
+        print('No DB Path Provided')
 
-
-db.init_app(app)
-
-class Data(db.Model):
-    __tablename__ = 'batch_jobs'
-    id = db.Column(db.Integer, primary_key=True)
-    batch_number = db.Column(db.Integer, nullable=True)
-    submitted_at = db.Column(db.String(50), nullable=True)
-    nodes_used = db.Column(db.Integer, nullable=True)
-
-    def __repr__(self):
-        return f"<Data {self.batch_number}>"
-    # Method to generate a dictionary based on table information 
-    def to_dict(self):
-        return {column.name: getattr(self, column.name) for column in self.__table__.columns }
-    
-with app.app_context():
-    db.drop_all()
-    db.create_all()
+def create_table(cursor):
+    create_table = """
+    CREATE TABLE IF NOT EXISTS batch_jobs (
+    ID int,
+    SUBMITTED_AT varchar(50)
+    NODES_USED int
+    )
+    """
+    cursor.execute(create_table)
 
 
-with app.app_context():
-    db.session.query(Data).delete()
-    with open("example_batch_records.csv", 'r') as fileName:
-        reader = csv.reader(fileName, delimiter=",")
-        for row in reader:
-            batch_clean = ''.join(i for i in row[0] if i.isdigit())
-            batch_number = int(batch_clean)
-            submitted_at= row[1]
-            nodes_used = row[2]
-            db.session.add_all([
-                Data(batch_number=batch_number, submitted_at=submitted_at, nodes_used=nodes_used)
-            ])
-    db.session.commit()
+def read_csv(path, cursor):
+    with open(path) as csvfile:
+        file_reader = csv.reader(csvfile, newline='')
+        next(file_reader)
+        for row in file_reader:
+            insert_sql = 'INSERT INTO batch_jobs (ID, SUBMITTED_AT, NODES_USED) VALUES (?, ?, ?)'
+            cursor.execute(insert_sql, row)
+    print('Done adding rows')
 
-@app.route("/batch_jobs", methods=["GET"])
-def batch_jobs():
-    data = db.session.execute(db.select(Data).order_by(Data.id))
-    all_records = data.scalars().all()
-    return jsonify({"links": {
-                    "self": request.url},
-                    "data": [{
-                       "id": row.id,
-                       "type": "batch_jobs",
-                       "attributes": {
-                           "batch_number": row.batch_number,
-                           "submitted_at": row.submitted_at,
-                           "nodes_used": row.nodes_used
-                       }
-                   } for row in all_records] })
+def commit_and_close(connection):
+    connection.commit()
+    connection.close()
 
 
-@app.route('/batch_jobs/', methods=["GET"])
-def filter_batch_data():
-    pass
+def main():
+    db_path = './src/batch_jobs.db'
+    csv_path = './example_batch_records.csv'
+    connection, cursor = connect_to_database(db_path)
 
-if __name__ == '__main__':
-    app.run(debug=True)
+    create_table(cursor)
+
+    read_csv(csv_path, cursor)
+
+    commit_and_close(connection)
+
+
+main()
