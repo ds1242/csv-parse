@@ -1,6 +1,9 @@
 import csv
 import sqlite3
 
+def get_path_to_file():
+    path_to_file = input('Please enter a path to the CSV file:\n')
+    return path_to_file
 
 def connect_to_database(db_path):
     if db_path:
@@ -50,7 +53,7 @@ def commit_and_close(connection):
 
 def main():
     db_path = './src/batch_jobs.db'
-    csv_path = './example_batch_records.csv'
+    csv_path = get_path_to_file()
     connection, cursor = connect_to_database(db_path)
 
     drop_table_if_exists(cursor)
