@@ -1,29 +1,5 @@
-
-## OLCF Software Services Development Team - Coding Exercise 01
-
-### Overview
-
-The simplified exercise below is representative of the kind applications we build within the OLCF Software Services Development Team. When you are finished with the coding exercise, please send your submission directly to us via email as a `.tar.gz` or `.zip` file. For programmers experienced in web application design, the exercise should take approximately (2) hours to complete. For programmers with no recent experience with web application design, the exercise could take approximately (10) hours, if you account for time spent "getting up to speed".
-
-### Deliverable
-
-Using a Ruby or Python based web application framework (e.g. Rails, Sinatra, Django, or Flask), write a small application that provides a single RESTful API endpoint which returns a filtered set of "batch job records" from the provided dataset. We have no preference between Ruby and Python. For the sake of this exercise, think of a "batch job record" as a concise summary of some work done on a supercomputer.
-
-Your deliverable, at minimum:
-
-- Should provide an informative `README.md` (i.e., run/installation instructions, what could be improved, etc.)
-- Should ETL the provided CSV into a database of your choosing
-- Should gracefully handle omissions within the example dataset
-- Should provide a functional API endpoint at `/batch_jobs`
-- Your API endpoint should respond with a [JSON-API](http://jsonapi.org/format/#fetching-resources) document (string)
-- Your API endpoint should correctly filter the dataset based upon any combination of filter keywords (see "Filter Keywords" section below)
-- Should provide basic test(s) as you see fit
-
-Please avoid identifying yourslf by name within the source code itself (delete that `.git` directory!) Limited use of open-source third-party gems/packages beyond your chosen framework is fine, as long as your `README` describes the build/installation process thoroughly. We will build and run your source code exactly according to your instructions.
-
-### Specifications
-
-Below are detailed specifications to which your deliverable should adhere.
+# CSV Parsing 
+This takes a command line argument path to the csv file.  It should check that it is a valid pathway.  If the path is valid it will then transfer the data into a sqlite db table.  If it the first script was successful it will execute the second script and start a Flask server at http://127.0.0.1:5000.  At the endpoint /batch_jobs it will actually display all of the data.  Refer to the API response section below for filtering of the data.  
 
 #### Example Data
 
