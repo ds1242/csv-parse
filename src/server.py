@@ -11,17 +11,33 @@ def get_batch_jobs():
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
 
-    select_sql = "SELECT * FROM batch_jobs"
+    select_sql = "SELECT * FROM batch_jobs WHERE 1=1"
     # print(request.args.get('[min_nodes]'))
     min_nodes = request.args.get('filter[min_nodes]')
     max_nodes = request.args.get('filter[max_nodes]')
     submitted_before = request.args.get('filter[submitted_before]')
     submitted_after = request.args.get('filter[submitted_after]')
-    
+
 
     query_params = []
 
-    cursor.execute(select_sql)
+    if min_nodes:
+        select_sql += 'AND nodes_used >= ?'
+        query_params.append(min_nodes)
+
+    if max_nodes:
+        select_sql += 'AND nodes_used <= ?'
+        query_params.append(max_nodes)
+
+    if submitted_before:
+        select_sql += 'AND submitted_at <= ?'
+        query_params.append(submitted_before)
+
+    if submitted_after:
+        select_sql += 'AND submitted_at >= ?'
+        query_params.append(submitted_after)
+
+    cursor.execute(select_sql, query_params)
 
     rows = cursor.fetchall()
 
