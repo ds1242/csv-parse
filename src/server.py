@@ -12,6 +12,14 @@ def get_batch_jobs():
     cursor = connection.cursor()
 
     select_sql = "SELECT * FROM batch_jobs"
+    # print(request.args.get('[min_nodes]'))
+    min_nodes = request.args.get('filter[min_nodes]')
+    max_nodes = request.args.get('filter[max_nodes]')
+    submitted_before = request.args.get('filter[submitted_before]')
+    submitted_after = request.args.get('filter[submitted_after]')
+    
+
+    query_params = []
 
     cursor.execute(select_sql)
 
